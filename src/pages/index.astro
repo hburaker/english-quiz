@@ -1,0 +1,171 @@
+---
+import '../styles/global.css';
+---
+
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Kelime Avı · İngilizce–Türkçe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="bubbles" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span><span></span>
+    </div>
+
+    <main class="app">
+      <!-- ============ BAŞLANGIÇ EKRANI ============ -->
+      <section id="screen-start" class="screen active">
+        <header class="hero">
+          <div class="logo">🦉</div>
+          <h1>Kelime Avı</h1>
+          <p class="subtitle">İngilizce ⇄ Türkçe kelime oyunu</p>
+        </header>
+
+        <h2 class="step-title"><span class="step">1</span> Seviyeni seç</h2>
+        <div class="levels">
+          <button class="level-card easy" data-level="kolay">
+            <span class="level-emoji">🌱</span>
+            <span class="level-name">Kolay</span>
+            <span class="level-desc">Günlük temel kelimeler</span>
+          </button>
+          <button class="level-card medium" data-level="orta">
+            <span class="level-emoji">🚀</span>
+            <span class="level-name">Orta</span>
+            <span class="level-desc">Okul, şehir, duygular</span>
+          </button>
+          <button class="level-card hard" data-level="zor">
+            <span class="level-emoji">🏆</span>
+            <span class="level-name">Zor</span>
+            <span class="level-desc">Bilim, doğa, fiiller</span>
+          </button>
+        </div>
+
+        <div class="divider"><span>ya da</span></div>
+
+        <label class="upload" id="upload-zone">
+          <input type="file" id="file-input" accept=".xlsx,.xls,.csv" hidden />
+          <span class="upload-icon">📂</span>
+          <span class="upload-text">
+            <strong>Kendi Excel dosyanı yükle</strong>
+            <small>1. sütun İngilizce, 2. sütun Türkçe</small>
+          </span>
+        </label>
+        <p id="upload-status" class="upload-status" role="status"></p>
+
+        <h2 class="step-title"><span class="step">2</span> Kaç kelime?</h2>
+        <div class="counts" role="radiogroup" aria-label="Kelime sayısı">
+          <button class="count-chip" data-count="10">10</button>
+          <button class="count-chip active" data-count="20">20</button>
+          <button class="count-chip" data-count="50">50</button>
+          <button class="count-chip" data-count="0">Hepsi</button>
+        </div>
+
+        <button id="btn-start" class="btn btn-primary btn-big" disabled>
+          Bir seviye seç ya da dosya yükle
+        </button>
+      </section>
+
+      <!-- ============ OYUN EKRANI ============ -->
+      <section id="screen-game" class="screen">
+        <div class="topbar">
+          <span id="game-source" class="pill">Kolay</span>
+          <span id="game-progress-text" class="progress-text">1 / 20</span>
+          <button id="btn-finish" class="btn btn-ghost btn-small">Oyunu Bitir</button>
+        </div>
+        <div class="progress"><div id="progress-bar" class="progress-bar"></div></div>
+
+        <div class="score-row">
+          <span class="score known">✅ <b id="score-known">0</b></span>
+          <span class="score unknown">❌ <b id="score-unknown">0</b></span>
+        </div>
+
+        <div class="card-wrap">
+          <div id="card" class="card">
+            <div class="card-face card-front">
+              <span id="card-lang" class="lang-badge">🇬🇧 İngilizce</span>
+              <span id="card-word" class="word">apple</span>
+              <span class="hint">Bu kelimenin karşılığı ne?</span>
+            </div>
+            <div class="card-face card-back">
+              <span id="card-answer-lang" class="lang-badge">🇹🇷 Türkçe</span>
+              <span id="card-answer" class="word">elma</span>
+              <span id="card-question-small" class="hint">apple</span>
+            </div>
+          </div>
+        </div>
+
+        <button id="btn-reveal" class="btn btn-reveal btn-big">👀 Cevabı Göster</button>
+
+        <div class="judge">
+          <button id="btn-known" class="btn btn-known">✅ Bildim</button>
+          <button id="btn-unknown" class="btn btn-unknown">❌ Bilemedim</button>
+        </div>
+
+        <button id="btn-next" class="btn btn-primary btn-big">Sonraki Kelime ➜</button>
+
+        <p class="keys">
+          Kısayollar: <kbd>Boşluk</kbd> cevap · <kbd>1</kbd> bildim · <kbd>2</kbd> bilemedim ·
+          <kbd>Enter</kbd> sonraki
+        </p>
+      </section>
+
+      <!-- ============ SONUÇ EKRANI ============ -->
+      <section id="screen-result" class="screen">
+        <div class="result-head">
+          <div id="result-emoji" class="result-emoji">🎉</div>
+          <h2 id="result-title">Harika iş!</h2>
+          <p id="result-message" class="subtitle"></p>
+        </div>
+
+        <div class="result-main">
+          <div class="donut-wrap">
+            <svg viewBox="0 0 120 120" class="donut" aria-hidden="true">
+              <circle cx="60" cy="60" r="50" class="donut-bg"></circle>
+              <circle id="donut-known" cx="60" cy="60" r="50" class="donut-seg known"></circle>
+              <circle id="donut-unknown" cx="60" cy="60" r="50" class="donut-seg unknown"></circle>
+            </svg>
+            <div class="donut-center">
+              <b id="result-percent">0%</b>
+              <small>başarı</small>
+            </div>
+          </div>
+
+          <div class="stats">
+            <div class="stat known"><b id="stat-known">0</b><span>Bildim</span></div>
+            <div class="stat unknown"><b id="stat-unknown">0</b><span>Bilemedim</span></div>
+            <div class="stat skipped"><b id="stat-skipped">0</b><span>İşaretsiz</span></div>
+            <div class="stat total"><b id="stat-total">0</b><span>Toplam</span></div>
+          </div>
+        </div>
+
+        <div class="lists">
+          <details id="list-unknown-box" class="word-list unknown" open>
+            <summary>❌ Bilemediğin kelimeler (<span id="count-unknown-list">0</span>)</summary>
+            <ul id="list-unknown"></ul>
+          </details>
+          <details id="list-known-box" class="word-list known">
+            <summary>✅ Bildiğin kelimeler (<span id="count-known-list">0</span>)</summary>
+            <ul id="list-known"></ul>
+          </details>
+        </div>
+
+        <div class="result-actions">
+          <button id="btn-retry-unknown" class="btn btn-unknown btn-big">🔁 Bilemediklerimi Tekrar Çalış</button>
+          <button id="btn-play-again" class="btn btn-primary btn-big">🎲 Yeni Oyun (Aynı Liste)</button>
+          <button id="btn-home" class="btn btn-ghost btn-big">🏠 Ana Menü</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="../scripts/game.ts"></script>
+  </body>
+</html>
